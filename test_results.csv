@@ -1,0 +1,26 @@
+ID,Req,Test,Input,Expected,Actual,Result
+T01,FR2,"Login, valid credentials",admin/admin123,"200, role administrator","200, administrator",PASS
+T02,FR2,"Login, wrong password",admin/wrong,401,401,PASS
+T03,FR1,Register new resident,res_31004b/secret123,201,201,PASS
+T04,FR1,Register existing username,admin,409,409,PASS
+T05,FR1,Register too-short username/password,ab/123,400,400,PASS
+T06,"FR3, NFR4","Staff endpoint, no token",GET /api/readings,401,401,PASS
+T07,NFR4,"Staff endpoint, invalid token",token 'abc',401,401,PASS
+T08,FR3,Resident calls staff endpoint,GET /api/alerts as resident,403,403,PASS
+T09,"FR3, FR14",Resident tries to create user,POST /api/users as resident,403,403,PASS
+T10,FR12,Resident submits report,valid report,201,201,PASS
+T11,FR13,Residents see only own reports; staff see all,resident2 vs officer,resident2: 0 of resident1's; officer: ≥1,resident2: 0; officer: 1,PASS
+T12,NFR5,Empty report rejected,blank location and description,400,400,PASS
+T13,"FR4, FR5",Classify a clear short_circuit reading,"{'voltage': 120, 'current': 150, 'leakage_ma': 5, 'power_factor': 0.4}",short_circuit,short_circuit,PASS
+T14,"FR4, FR5",Classify a clear open_circuit reading,"{'voltage': 240, 'current': 0.1, 'leakage_ma': 1, 'power_factor': 0.1}",open_circuit,open_circuit,PASS
+T15,"FR4, FR5",Classify a clear earth_fault reading,"{'voltage': 222, 'current': 15, 'leakage_ma': 150, 'power_factor': 0.8}",earth_fault,earth_fault,PASS
+T16,"FR4, FR5",Classify a clear overload reading,"{'voltage': 210, 'current': 30, 'leakage_ma': 3, 'power_factor': 0.8}",overload,overload,PASS
+T17,"FR4, FR5",Classify a clear normal reading,"{'voltage': 230, 'current': 8, 'leakage_ma': 2, 'power_factor': 0.95}",normal,normal,PASS
+T18,FR4,"Sensor reading, wrong API key",key 'wrong',401,401,PASS
+T19,NFR5,Sensor reading with missing fields,only node_id and voltage,400,400,PASS
+T20,"FR8, FR10",Fault readings created alerts,after T13-T16,≥ 1 alert listed,23 alerts,PASS
+T21,FR3,Resident tries to acknowledge alert,POST ack as resident,403,403,PASS
+T22,FR11,Officer acknowledges alert,POST ack as officer,"status acknowledged, by officer","acknowledged, officer",PASS
+T23,FR14,Admin creates a safety officer,off_0d8c0b,201; new user logs in as safety_officer,201; safety_officer,PASS
+T24,FR15,Admin lists users,GET /api/users,new user listed,True,PASS
+T25,NFR1,Classification response time,100 sequential readings,mean and max under 2000 ms,"mean 88 ms, max 182 ms",PASS
